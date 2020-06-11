@@ -3,12 +3,15 @@
 namespace Tests\Feature;
 
 use App\Services\DNAService;
+use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Mockery;
 use Symfony\Component\HttpFoundation\Response;
 use Tests\TestCase;
 
 class MutantsTest extends TestCase
 {
+    use DatabaseMigrations;
+
     /**
      * @test
      *

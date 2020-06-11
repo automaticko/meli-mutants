@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App;
 use App\Http\Requests\Mutant\StoreRequest;
+use App\Models\Dna;
 use App\Services\DNAService;
-use App\Services\StatsService;
 use Illuminate\Support\Facades\Response;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
@@ -15,12 +15,14 @@ class MutantController extends Controller
     {
         $sequence = $request->get('dna', []);
 
-        $dnaService   = App::make(DNAService::class, ['sequence' => $sequence]);
-        $statsService = App::make(StatsService::class);
+        $dnaService = App::make(DNAService::class, ['sequence' => $sequence]);
 
-        $hasMutantGenes = $dnaService->hasMutantGenes();
-        $httpStatusCode = $hasMutantGenes ? SymfonyResponse::HTTP_OK : SymfonyResponse::HTTP_FORBIDDEN;
-        $hasMutantGenes ? $statsService->addMutant() : $statsService->addHuman();
+        $dna = Dna::create([
+            'sequence'  => $sequence,
+            'is_mutant' => $dnaService->hasMutantGenes(),
+        ]);
+
+        $httpStatusCode = $dna->isMutant() ? SymfonyResponse::HTTP_OK : SymfonyResponse::HTTP_FORBIDDEN;
 
         return Response::noContent($httpStatusCode);
     }
